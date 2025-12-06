@@ -1,0 +1,62 @@
+@model IEnumerable<OldIsGold.DAL.Models.Report>
+@{
+    ViewData["Title"] = "Manage Reports";
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <h1 style="color: var(--brown-dark); margin-bottom: 30px;">Manage Reports</h1>
+
+    <div style="margin-bottom: 20px;">
+        <a href="/Admin/Reports" class="btn @(ViewBag.StatusFilter == null ? "btn-secondary" : "btn-outline-secondary")" style="margin-right: 10px;">All</a>
+        <a href="/Admin/Reports?status=Pending" class="btn @(ViewBag.StatusFilter?.ToString() == "Pending" ? "btn-secondary" : "btn-outline-secondary")" style="margin-right: 10px;">Pending</a>
+        <a href="/Admin/Reports?status=Resolved" class="btn @(ViewBag.StatusFilter?.ToString() == "Resolved" ? "btn-secondary" : "btn-outline-secondary")" style="margin-right: 10px;">Resolved</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card" style="text-align: center; padding: 30px;">
+            <p>No reports found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-3">
+            @foreach (var report in Model)
+            {
+                <div class="card card-light">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span class="badge @(report.Status == OldIsGold.DAL.Models.ReportStatus.Pending ? "badge-pending" : "badge-approved")">
+                            @report.Status
+                        </span>
+                        <span style="font-size: 0.8rem; color: #666;">@report.ReportDate.ToString("MMM dd")</span>
+                    </div>
+
+                    <h4 style="color: var(--neon-orange); margin-bottom: 5px;">@report.Reason</h4>
+                    <p style="font-size: 0.9rem; margin-bottom: 15px;">"@report.Description"</p>
+
+                    <div style="background: #eee; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="font-size: 0.8rem; font-weight: bold;">Reported Item:</div>
+                        <a href="/Item/Details/@report.ItemId" style="color: var(--brown-dark);">@report.Item?.Title</a>
+                        <div style="font-size: 0.8rem; color: #666;">By: @report.Reporter?.FullName</div>
+                    </div>
+
+                    @if (report.Status == OldIsGold.DAL.Models.ReportStatus.Pending)
+                    {
+                        <div style="display: flex; gap: 10px;">
+                            <form asp-action="ResolveReport" method="post" style="flex: 1;">
+                                <input type="hidden" name="reportId" value="@report.ReportId" />
+                                <input type="hidden" name="action" value="dismiss" />
+                                <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 5px; font-size: 0.8rem;">Dismiss</button>
+                            </form>
+                            <form asp-action="ResolveReport" method="post" style="flex: 1;">
+                                <input type="hidden" name="reportId" value="@report.ReportId" />
+                                <input type="hidden" name="action" value="delete_item" />
+                                <button type="submit" class="btn btn-danger" style="width: 100%; padding: 5px; font-size: 0.8rem;">Delete Item</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

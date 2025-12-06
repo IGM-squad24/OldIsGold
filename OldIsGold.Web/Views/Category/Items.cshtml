@@ -1,0 +1,51 @@
+@model IEnumerable<OldIsGold.DAL.Models.Item>
+@{
+    ViewData["Title"] = ViewBag.CategoryName;
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="/Category" style="color: var(--text-secondary); text-decoration: none; margin-bottom: 10px; display: inline-block;">&larr; Back to Categories</a>
+            <h1 style="color: var(--brown-dark); margin: 0;">@ViewBag.CategoryName</h1>
+        </div>
+        <a href="/Item?categoryId=@ViewBag.CategoryId" class="btn btn-secondary">Use Advanced Filters</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card" style="text-align: center; padding: 50px;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🏺</div>
+            <h3>No items in this category yet</h3>
+            <p>Be the first to list something here!</p>
+            <a href="/Item/Create" class="btn btn-primary" style="margin-top: 20px;">Sell an Item</a>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-4">
+            @foreach (var item in Model)
+            {
+                <div class="item-card" onclick="location.href='/Item/Details/@item.ItemId'">
+                    <div style="position: relative;">
+                        @if (item.Images != null && item.Images.Any())
+                        {
+                            var mainImage = item.Images.FirstOrDefault(i => i.IsMain) ?? item.Images.First();
+                            <img src="data:@mainImage.ContentType;base64,@Convert.ToBase64String(mainImage.ImageData)" alt="@item.Title">
+                        }
+                        else
+                        {
+                            <div style="height: 250px; background: #ddd; display: flex; align-items: center; justify-content: center; color: #888;">
+                                No Image
+                            </div>
+                        }
+                    </div>
+                    <div class="item-card-body">
+                        <h4 class="item-card-title" style="font-size: 1rem;">@item.Title</h4>
+                        <div class="item-card-price" style="font-size: 1.2rem;">$@item.Price.ToString("N2")</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

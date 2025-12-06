@@ -1,0 +1,92 @@
+@model OldIsGold.DAL.Models.Item
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <h1 style="color: var(--brown-dark); margin-bottom: 30px;">🛒 Checkout</h1>
+
+    <div class="row" style="display: flex; gap: 40px; flex-wrap: wrap;">
+        <!-- Order Summary -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card">
+                <h3 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px;">Order Summary</h3>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div style="width: 80px; height: 80px; background: #ddd; border-radius: 8px; overflow: hidden;">
+                        @if (Model.Images != null && Model.Images.Any())
+                        {
+                            var img = Model.Images.FirstOrDefault(i => i.IsMain) ?? Model.Images.First();
+                            <img src="data:@img.ContentType;base64,@Convert.ToBase64String(img.ImageData)" style="width: 100%; height: 100%; object-fit: cover;">
+                        }
+                    </div>
+                    <div>
+                        <h4 style="margin: 0;">@Model.Title</h4>
+                        <div style="color: #ccc;">Sold by @Model.Seller?.FullName</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Item Price</span>
+                    <span>$@Model.Price.ToString("N2")</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Shipping</span>
+                    <span style="color: var(--neon-green);">Free</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem; font-weight: bold; color: var(--gold);">
+                    <span>Total</span>
+                    <span>$@Model.Price.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card card-light">
+                <h3 style="color: var(--brown-dark); margin-bottom: 20px;">Payment Details</h3>
+                
+                <form asp-action="ProcessPayment" method="post">
+                    <input type="hidden" name="itemId" value="@Model.ItemId" />
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">Select Payment Method</label>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;">
+                                <input type="radio" name="paymentMethod" value="Credit Card" checked>
+                                <span>💳 Credit Card</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;">
+                                <input type="radio" name="paymentMethod" value="PayPal">
+                                <span>🅿️ PayPal</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">Card Number (Demo)</label>
+                        <input type="text" class="form-control" placeholder="0000 0000 0000 0000" disabled style="background: #eee;">
+                    </div>
+
+                    <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                        <div style="flex: 1;">
+                            <label class="form-label">Expiry</label>
+                            <input type="text" class="form-control" placeholder="MM/YY" disabled style="background: #eee;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label">CVV</label>
+                            <input type="text" class="form-control" placeholder="123" disabled style="background: #eee;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.2rem;">
+                        Pay $@Model.Price.ToString("N2")
+                    </button>
+                    <div style="text-align: center; margin-top: 10px; font-size: 0.9rem; color: #666;">
+                        🔒 Secure Payment (Demo Mode)
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+@model OldIsGold.Web.Models.EditProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h2 style="color: var(--gold); margin-bottom: 30px; text-align: center;">Edit Profile</h2>
+
+        <form asp-action="EditProfile" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div style="margin-bottom: 20px;">
+                <label asp-for="FullName" class="form-label">Full Name</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label asp-for="Email" class="form-label">Email Address</label>
+                <input asp-for="Email" class="form-control" readonly style="background-color: #eee; cursor: not-allowed;" />
+                <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">Email cannot be changed. Contact support if needed.</div>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                <a href="/Account/Profile" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

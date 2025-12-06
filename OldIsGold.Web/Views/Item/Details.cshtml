@@ -1,0 +1,183 @@
+@model OldIsGold.DAL.Models.Item
+@{
+    ViewData["Title"] = Model.Title;
+    bool isWishlisted = ViewBag.IsWishlisted == true;
+    var relatedItems = ViewBag.RelatedItems as List<OldIsGold.DAL.Models.Item>;
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 80px;">
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px;">
+        <a href="/Item" style="color: var(--brown-dark); text-decoration: none;">Browse</a> &gt; 
+        <a href="/Item?categoryId=@Model.CategoryId" style="color: var(--brown-dark); text-decoration: none;">@Model.Category?.Name</a> &gt; 
+        <span style="color: var(--text-secondary);">@Model.Title</span>
+    </div>
+
+    <div class="row" style="display: flex; gap: 40px; flex-wrap: wrap;">
+        
+        <!-- Left Column: Images -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card" style="padding: 10px; overflow: hidden;">
+                @if (Model.Images != null && Model.Images.Any())
+                {
+                    var mainImage = Model.Images.FirstOrDefault(i => i.IsMain) ?? Model.Images.First();
+                    <img id="mainImage" src="data:@mainImage.ContentType;base64,@Convert.ToBase64String(mainImage.ImageData)" 
+                         style="width: 100%; height: 400px; object-fit: contain; border-radius: 8px; background: #f0f0f0;" alt="@Model.Title">
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px;">
+                        @foreach (var img in Model.Images)
+                        {
+                            <img src="data:@img.ContentType;base64,@Convert.ToBase64String(img.ImageData)" 
+                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;"
+                                 onclick="document.getElementById('mainImage').src = this.src; this.style.borderColor = 'var(--neon-blue)';"
+                                 onmouseover="this.style.transform = 'scale(1.05)'"
+                                 onmouseout="this.style.transform = 'scale(1)'"
+                                 alt="Item thumbnail">
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div style="height: 400px; background: #ddd; display: flex; align-items: center; justify-content: center; color: #888; font-size: 1.5rem;">
+                        No Images Available
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right Column: Details -->
+        <div style="flex: 1; min-width: 300px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 10px;">@Model.Title</h1>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <span class="price-highlight">$@Model.Price.ToString("N2")</span>
+                <span class="badge badge-approved">@Model.Condition</span>
+                @if (Model.Year.HasValue)
+                {
+                    <span class="badge" style="background: var(--brown-card); color: var(--gold);">Year: @Model.Year</span>
+                }
+            </div>
+
+            <div class="card card-light" style="margin-bottom: 30px;">
+                <h4 style="border-bottom: 1px solid #ddd; padding-bottom: 10px;">Description</h4>
+                <p style="white-space: pre-line;">@Model.Description</p>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <h5 style="color: var(--text-secondary);">Seller Information</h5>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="width: 50px; height: 50px; background: var(--brown-card); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; font-size: 1.2rem;">
+                        @(Model.Seller?.FullName?.Substring(0, 1) ?? "S")
+                    </div>
+                    <div>
+                        <div style="font-weight: bold;">@Model.Seller?.FullName</div>
+                        <div style="font-size: 0.9rem; color: #666;">Member since @Model.Seller?.JoinDate.ToString("yyyy")</div>
+                    </div>
+                    <a href="/Message/Create?receiverId=@Model.SellerId&itemId=@Model.ItemId" class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.9rem; margin-left: auto;">
+                        📩 Contact Seller
+                    </a>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    if (User.IsInRole("Buyer"))
+                    {
+                        <form asp-controller="Order" asp-action="Checkout" method="get" style="flex: 1;">
+                            <input type="hidden" name="itemId" value="@Model.ItemId" />
+                            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.2rem;">
+                                🛒 Buy Now
+                            </button>
+                        </form>
+
+                        <form asp-action="@(isWishlisted ? "RemoveFromWishlist" : "AddToWishlist")" asp-route-id="@Model.ItemId" method="post" style="flex: 1;">
+                            <button type="submit" class="btn @(isWishlisted ? "btn-danger" : "btn-secondary")" style="width: 100%; font-size: 1.2rem;">
+                                @(isWishlisted ? "💔 Remove from Wishlist" : "❤️ Add to Wishlist")
+                            </button>
+                        </form>
+                    }
+                }
+                else
+                {
+                    <a href="/Account/Login?returnUrl=/Item/Details/@Model.ItemId" class="btn btn-primary" style="flex: 1;">Login to Buy</a>
+                }
+            </div>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" onclick="document.getElementById('reportForm').style.display = 'block'" style="background: none; border: none; color: #888; text-decoration: underline; cursor: pointer;">
+                        ⚠️ Report this item
+                    </button>
+                </div>
+
+                <div id="reportForm" class="card" style="display: none; margin-top: 20px; background: #fff; border: 1px solid #ddd;">
+                    <h4>Report Item</h4>
+                    <form asp-action="Report" asp-route-id="@Model.ItemId" method="post">
+                        <div style="margin-bottom: 15px;">
+                            <label class="form-label">Reason</label>
+                            <select name="reason" class="form-control" required>
+                                <option value="Fake/Counterfeit">Fake/Counterfeit</option>
+                                <option value="Inappropriate Content">Inappropriate Content</option>
+                                <option value="Scam">Scam</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-danger" style="padding: 8px 20px;">Submit Report</button>
+                            <button type="button" class="btn btn-secondary" style="padding: 8px 20px;" onclick="document.getElementById('reportForm').style.display = 'none'">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Related Items -->
+    @if (relatedItems != null && relatedItems.Any())
+    {
+        <div style="margin-top: 60px;">
+            <h3 style="border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 30px; display: inline-block;">
+                Related Treasures
+            </h3>
+            <div class="grid grid-4">
+                @foreach (var item in relatedItems)
+                {
+                    <div class="item-card" onclick="location.href='/Item/Details/@item.ItemId'">
+                        <div style="position: relative;">
+                            @if (item.Images != null && item.Images.Any())
+                            {
+                                var mainImage = item.Images.FirstOrDefault(i => i.IsMain) ?? item.Images.First();
+                                <img src="data:@mainImage.ContentType;base64,@Convert.ToBase64String(mainImage.ImageData)" alt="@item.Title">
+                            }
+                            else
+                            {
+                                <div style="height: 250px; background: #ddd; display: flex; align-items: center; justify-content: center; color: #888;">
+                                    No Image
+                                </div>
+                            }
+                        </div>
+                        <div class="item-card-body">
+                            <h4 class="item-card-title" style="font-size: 1rem;">@item.Title</h4>
+                            <div class="item-card-price" style="font-size: 1.2rem;">$@item.Price.ToString("N2")</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    @@media (max-width: 768px) {
+        .row {
+            flex-direction: column;
+        }
+    }
+</style>

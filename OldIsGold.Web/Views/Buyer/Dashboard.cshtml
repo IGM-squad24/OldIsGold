@@ -1,0 +1,74 @@
+@{
+    ViewData["Title"] = "Buyer Dashboard";
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <h1 style="color: var(--brown-dark); margin-bottom: 10px;">Welcome back!</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 30px;">Here's what's happening with your account.</p>
+
+    <!-- Stats -->
+    <div class="grid grid-3" style="margin-bottom: 40px;">
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">❤️</div>
+            <h3 style="color: var(--gold);">@ViewBag.WishlistCount</h3>
+            <p>Items in Wishlist</p>
+            <a href="/Buyer/Wishlist" class="btn btn-secondary" style="margin-top: 10px;">View Wishlist</a>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">📦</div>
+            <h3 style="color: var(--gold);">@ViewBag.OrdersCount</h3>
+            <p>Total Orders</p>
+            <a href="/Buyer/Orders" class="btn btn-secondary" style="margin-top: 10px;">View Orders</a>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">💰</div>
+            <h3 style="color: var(--gold);">$@(((decimal)ViewBag.TotalSpent).ToString("N2"))</h3>
+            <p>Total Spent</p>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div style="margin-bottom: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: var(--brown-dark);">Recent Orders</h2>
+            <a href="/Buyer/Orders" style="color: var(--neon-blue);">View All</a>
+        </div>
+
+        @if (ViewBag.RecentOrders != null && ((IEnumerable<dynamic>)ViewBag.RecentOrders).Any())
+        {
+            <div class="grid grid-3">
+                @foreach (var order in ViewBag.RecentOrders)
+                {
+                    <div class="card card-light">
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <div style="width: 60px; height: 60px; background: #ddd; border-radius: 8px; overflow: hidden;">
+                                @if (order.Item.Images != null && order.Item.Images.Count > 0)
+                                {
+                                    var img = order.Item.Images[0];
+                                    <img src="data:@img.ContentType;base64,@Convert.ToBase64String(img.ImageData)" style="width: 100%; height: 100%; object-fit: cover;">
+                                }
+                            </div>
+                            <div>
+                                <h4 style="margin: 0;">@order.Item.Title</h4>
+                                <div style="color: var(--neon-pink); font-weight: bold;">$@order.TotalAmount.ToString("N2")</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="badge @(order.Status == OldIsGold.DAL.Models.OrderStatus.Completed ? "badge-approved" : "badge-pending")">
+                                @order.Status
+                            </span>
+                            <a href="/Order/Details/@order.OrderId" style="font-size: 0.9rem;">Details &rarr;</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="card card-light" style="text-align: center; padding: 30px;">
+                <p>No recent orders found.</p>
+                <a href="/Item" class="btn btn-primary">Start Shopping</a>
+            </div>
+        }
+    </div>
+</div>

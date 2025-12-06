@@ -1,0 +1,24 @@
+@model IEnumerable<OldIsGold.DAL.Models.Category>
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <h1 style="color: var(--brown-dark); margin-bottom: 30px;">Manage Categories</h1>
+
+    <div class="grid grid-3">
+        @foreach (var category in Model)
+        {
+            <div class="card card-light" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">@category.Icon</div>
+                <h3>@category.Name</h3>
+                <p>@category.Description</p>
+                <div style="margin-top: 10px;">
+                    <span class="badge @(category.IsActive ? "badge-approved" : "badge-rejected")">
+                        @(category.IsActive ? "Active" : "Inactive")
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,36 @@
+@model OldIsGold.DAL.Models.Order
+@{
+    ViewData["Title"] = "Order Confirmed";
+}
+
+<div class="container" style="margin-top: 60px; margin-bottom: 80px; text-align: center;">
+    <div class="card" style="max-width: 600px; margin: 0 auto; padding: 40px;">
+        <div style="font-size: 5rem; margin-bottom: 20px; color: var(--neon-green);">✅</div>
+        <h1 style="color: var(--gold); margin-bottom: 10px;">Order Confirmed!</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 30px;">Thank you for your purchase. Your order has been placed successfully.</p>
+
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Order Number:</span>
+                <span style="font-weight: bold; color: var(--neon-blue);">#@Model.OrderId</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Date:</span>
+                <span>@Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Payment Method:</span>
+                <span>@Model.PaymentMethod</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-weight: bold; font-size: 1.2rem;">
+                <span>Total Paid:</span>
+                <span style="color: var(--gold);">$@Model.TotalAmount.ToString("N2")</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <a href="/Buyer/Orders" class="btn btn-primary">View My Orders</a>
+            <a href="/Item" class="btn btn-secondary">Continue Shopping</a>
+        </div>
+    </div>
+</div>

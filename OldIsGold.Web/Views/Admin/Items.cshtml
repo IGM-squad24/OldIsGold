@@ -1,0 +1,68 @@
+@model IEnumerable<OldIsGold.DAL.Models.Item>
+@{
+    ViewData["Title"] = "Manage Items";
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <h1 style="color: var(--brown-dark); margin-bottom: 30px;">Manage Items</h1>
+
+    <!-- Filters -->
+    <div style="margin-bottom: 20px;">
+        <a href="/Admin/Items" class="btn @(ViewBag.StatusFilter == null ? "btn-secondary" : "btn-outline-secondary")" style="margin-right: 10px;">All</a>
+        <a href="/Admin/Items?status=Pending" class="btn @(ViewBag.StatusFilter?.ToString() == "Pending" ? "btn-secondary" : "btn-outline-secondary")" style="margin-right: 10px;">Pending Approval</a>
+        <a href="/Admin/Items?status=Approved" class="btn @(ViewBag.StatusFilter?.ToString() == "Approved" ? "btn-secondary" : "btn-outline-secondary")" style="margin-right: 10px;">Approved</a>
+        <a href="/Admin/Items?status=Rejected" class="btn @(ViewBag.StatusFilter?.ToString() == "Rejected" ? "btn-secondary" : "btn-outline-secondary")" style="margin-right: 10px;">Rejected</a>
+    </div>
+
+    <div class="grid grid-3">
+        @foreach (var item in Model)
+        {
+            <div class="card card-light" style="position: relative;">
+                <div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                    <span class="badge @(item.Status == OldIsGold.DAL.Models.ItemStatus.Approved ? "badge-approved" : (item.Status == OldIsGold.DAL.Models.ItemStatus.Pending ? "badge-pending" : "badge-rejected"))">
+                        @item.Status
+                    </span>
+                </div>
+                
+                <div style="height: 200px; background: #ddd; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+                    @if (item.Images != null && item.Images.Any())
+                    {
+                        var mainImage = item.Images.FirstOrDefault(i => i.IsMain) ?? item.Images.First();
+                        <img src="data:@mainImage.ContentType;base64,@Convert.ToBase64String(mainImage.ImageData)" style="width: 100%; height: 100%; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #888;">No Image</div>
+                    }
+                </div>
+
+                <h4 style="margin-bottom: 5px;">@item.Title</h4>
+                <div style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">Seller: @item.Seller?.FullName</div>
+                <div style="color: var(--neon-pink); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">$@item.Price.ToString("N2")</div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="/Item/Details/@item.ItemId" class="btn btn-secondary" style="flex: 1; padding: 5px; font-size: 0.8rem;">View</a>
+                    
+                    @if (item.Status == OldIsGold.DAL.Models.ItemStatus.Pending)
+                    {
+                        <form asp-action="ApproveItem" method="post" style="flex: 1;">
+                            <input type="hidden" name="itemId" value="@item.ItemId" />
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 5px; font-size: 0.8rem;">Approve</button>
+                        </form>
+                        <form asp-action="RejectItem" method="post" style="flex: 1;">
+                            <input type="hidden" name="itemId" value="@item.ItemId" />
+                            <button type="submit" class="btn btn-danger" style="width: 100%; padding: 5px; font-size: 0.8rem;">Reject</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="DeleteItem" method="post" style="flex: 1;" onsubmit="return confirm('Delete this item?');">
+                            <input type="hidden" name="itemId" value="@item.ItemId" />
+                            <button type="submit" class="btn btn-danger" style="width: 100%; padding: 5px; font-size: 0.8rem;">Delete</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

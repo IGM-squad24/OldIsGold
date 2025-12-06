@@ -1,0 +1,64 @@
+@model OldIsGold.Web.Models.ProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <div style="display: flex; align-items: center; gap: 30px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div style="width: 100px; height: 100px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--brown-dark); font-weight: bold;">
+                @(Model.FullName?.Substring(0, 1) ?? "U")
+            </div>
+            <div>
+                <h1 style="margin: 0; color: var(--gold);">@Model.FullName</h1>
+                <div style="color: #ccc;">@Model.Email</div>
+                <div style="margin-top: 10px;">
+                    <span class="badge badge-approved">@Model.UserType</span>
+                    <span style="margin-left: 10px; color: var(--neon-green);">Member since @Model.JoinDate.ToString("yyyy")</span>
+                </div>
+            </div>
+            <div style="margin-left: auto;">
+                <a href="/Account/EditProfile" class="btn btn-secondary">Edit Profile</a>
+            </div>
+        </div>
+
+        <div class="grid grid-3">
+            <div class="card card-light" style="text-align: center;">
+                <h3 style="color: var(--brown-dark);">Rating</h3>
+                <div style="font-size: 2.5rem; color: var(--gold);">
+                    @(Model.Rating > 0 ? Model.Rating.ToString("0.0") : "-")
+                </div>
+                <div style="color: #666;">User Rating</div>
+            </div>
+            
+            @if (Model.UserType == OldIsGold.DAL.Models.UserType.Buyer)
+            {
+                <div class="card card-light" style="text-align: center; cursor: pointer;" onclick="location.href='/Buyer/Orders'">
+                    <h3 style="color: var(--brown-dark);">Orders</h3>
+                    <div style="font-size: 2.5rem; color: var(--neon-blue);">📦</div>
+                    <div style="color: #666;">View History</div>
+                </div>
+                <div class="card card-light" style="text-align: center; cursor: pointer;" onclick="location.href='/Buyer/Wishlist'">
+                    <h3 style="color: var(--brown-dark);">Wishlist</h3>
+                    <div style="font-size: 2.5rem; color: var(--neon-pink);">❤️</div>
+                    <div style="color: #666;">View Saved</div>
+                </div>
+            }
+            else
+            {
+                <div class="card card-light" style="text-align: center; cursor: pointer;" onclick="location.href='/Seller/Dashboard'">
+                    <h3 style="color: var(--brown-dark);">Dashboard</h3>
+                    <div style="font-size: 2.5rem; color: var(--neon-green);">📊</div>
+                    <div style="color: #666;">Manage Store</div>
+                </div>
+            }
+        </div>
+        
+        <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <a href="/Account/ChangePassword" style="color: var(--neon-blue); text-decoration: none; margin-right: 20px;">Change Password</a>
+            <form asp-action="Logout" method="post" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: var(--neon-orange); cursor: pointer; font-size: 1rem;">Logout</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Old is Gold</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/" class="navbar-brand">
+                    <span>✨ Old is Gold</span>
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="/" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">Home</a></li>
+                    <li><a href="/Category" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active" : "")">Categories</a></li>
+                    <li><a href="/Item" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Item" ? "active" : "")">Browse Items</a></li>
+                    
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li><a href="/Admin/Dashboard" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")">Admin</a></li>
+                        }
+                        @if (User.IsInRole("Seller"))
+                        {
+                            <li><a href="/Seller/Dashboard" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Seller" ? "active" : "")">My Store</a></li>
+                        }
+                        @if (User.IsInRole("Buyer"))
+                        {
+                            <li><a href="/Buyer/Wishlist" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Buyer" && ViewContext.RouteData.Values["action"]?.ToString() == "Wishlist" ? "active" : "")">❤️ Wishlist</a></li>
+                            <li><a href="/Buyer/Orders" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Buyer" && ViewContext.RouteData.Values["action"]?.ToString() == "Orders" ? "active" : "")">Orders</a></li>
+                        }
+                        <li><a href="/Message" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Message" ? "active" : "")">📧 Messages</a></li>
+                        <li><a href="/Account/Profile" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["action"]?.ToString() == "Profile" ? "active" : "")">Profile</a></li>
+                        <li>
+                            <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
+                                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; color: var(--text-light);">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li><a href="/Account/Login" class="nav-link">Login</a></li>
+                        <li><a href="/Account/Register" class="btn btn-primary" style="padding: 8px 20px;">Get Started</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Old is Gold - A Modern Marketplace for Rare Antiques & Timeless Collectibles</p>
+            <p>
+                <a href="/Home/About">About</a> | 
+                <a href="/Home/Privacy">Privacy</a>
+            </p>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

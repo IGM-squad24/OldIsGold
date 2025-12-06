@@ -1,0 +1,87 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container" style="margin-top: 60px; margin-bottom: 60px; max-width: 600px;">
+    <div class="card card-light" style="padding: 40px;">
+        <h2 style="text-align: center; color: var(--gold); margin-bottom: 30px;">
+            ✨ Join Old is Gold
+        </h2>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 30px;">
+            Create your account to start buying or selling antiques
+        </p>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom: 20px;"></div>
+            
+            <div style="margin-bottom: 20px;">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="your@email.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" placeholder="Create a strong password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div style="margin-bottom: 30px; padding: 20px; background: var(--beige-bg); border-radius: 8px; border: 2px solid var(--brown-card);">
+                <label class="form-label" style="margin-bottom: 15px; font-size: 1.1rem;">I want to:</label>
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 1; padding: 15px; border: 2px solid var(--brown-card); border-radius: 8px; cursor: pointer; transition: all 0.3s;" 
+                         onclick="document.getElementById('seller-radio').checked = true; this.parentElement.querySelectorAll('div').forEach(d => d.style.borderColor = 'var(--brown-card)'); this.style.borderColor = 'var(--neon-green)'; this.style.boxShadow = '0 0 15px var(--neon-green)';">
+                        <input type="radio" asp-for="UserType" value="@UserType.Seller" id="seller-radio" style="margin-right: 10px;" />
+                        <label for="seller-radio" style="cursor: pointer; font-weight: 600; color: var(--neon-green);">
+                            🏪 Sell Antiques
+                        </label>
+                        <p style="margin: 8px 0 0 28px; font-size: 0.9rem; color: var(--text-secondary);">
+                            List and sell your collectibles
+                        </p>
+                    </div>
+                    <div style="flex: 1; padding: 15px; border: 2px solid var(--brown-card); border-radius: 8px; cursor: pointer; transition: all 0.3s;"
+                         onclick="document.getElementById('buyer-radio').checked = true; this.parentElement.querySelectorAll('div').forEach(d => d.style.borderColor = 'var(--brown-card)'); this.style.borderColor = 'var(--neon-blue)'; this.style.boxShadow = '0 0 15px var(--neon-blue)';">
+                        <input type="radio" asp-for="UserType" value="@UserType.Buyer" id="buyer-radio" checked style="margin-right: 10px;" />
+                        <label for="buyer-radio" style="cursor: pointer; font-weight: 600; color: var(--neon-blue);">
+                            🛍️ Buy Antiques
+                        </label>
+                        <p style="margin: 8px 0 0 28px; font-size: 0.9rem; color: var(--text-secondary);">
+                            Browse and purchase collectibles
+                        </p>
+                    </div>
+                </div>
+                <span asp-validation-for="UserType" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                Create Account
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 25px; padding-top: 25px; border-top: 1px solid var(--brown-card);">
+            <p style="color: var(--text-secondary);">
+                Already have an account? 
+                <a href="@Url.Action("Login", "Account")" style="color: var(--neon-blue); text-decoration: none; font-weight: 600;">
+                    Sign In
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

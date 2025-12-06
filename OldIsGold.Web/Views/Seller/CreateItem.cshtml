@@ -1,0 +1,83 @@
+@model OldIsGold.Web.Models.CreateItemViewModel
+@{
+    ViewData["Title"] = "List New Item";
+    var categories = ViewBag.Categories as List<OldIsGold.DAL.Models.Category>;
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <h2 style="color: var(--gold); margin-bottom: 30px; text-align: center;">List New Item</h2>
+
+        <form asp-action="CreateItem" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1;">
+                    <div style="margin-bottom: 20px;">
+                        <label asp-for="Title" class="form-label">Item Title</label>
+                        <input asp-for="Title" class="form-control" placeholder="e.g. Vintage 1950s Camera" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label asp-for="CategoryId" class="form-label">Category</label>
+                        <select asp-for="CategoryId" class="form-control">
+                            <option value="">Select Category</option>
+                            @if (categories != null)
+                            {
+                                foreach (var cat in categories)
+                                {
+                                    <option value="@cat.CategoryId">@cat.Name</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label asp-for="Price" class="form-label">Price ($)</label>
+                        <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div style="flex: 1;">
+                    <div style="margin-bottom: 20px;">
+                        <label asp-for="Condition" class="form-label">Condition</label>
+                        <select asp-for="Condition" class="form-control" asp-items="Html.GetEnumSelectList<OldIsGold.DAL.Models.ItemCondition>()">
+                            <option value="">Select Condition</option>
+                        </select>
+                        <span asp-validation-for="Condition" class="text-danger"></span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label asp-for="Year" class="form-label">Year (Optional)</label>
+                        <input asp-for="Year" class="form-control" type="number" placeholder="e.g. 1955" />
+                        <span asp-validation-for="Year" class="text-danger"></span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">Images (Max 5)</label>
+                        <input type="file" name="images" class="form-control" multiple accept="image/*" />
+                        <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">Upload clear photos of your item.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <label asp-for="Description" class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Describe your item in detail..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">List Item</button>
+                <a href="/Seller/Dashboard" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

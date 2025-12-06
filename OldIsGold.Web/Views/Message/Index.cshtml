@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Messages";
+    var conversations = ViewBag.Conversations as List<dynamic>;
+}
+
+<div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+    <h1 style="color: var(--brown-dark); margin-bottom: 30px;">📧 Messages</h1>
+
+    <div class="row" style="display: flex; gap: 30px; flex-wrap: wrap;">
+        <!-- Sidebar / Conversation List -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 15px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin: 0; font-size: 1.2rem;">Inbox</h3>
+                </div>
+                
+                @if (conversations != null && conversations.Any())
+                {
+                    <div style="max-height: 600px; overflow-y: auto;">
+                        @foreach (var conv in conversations)
+                        {
+                            var contact = conv.Contact;
+                            var lastMsg = conv.LastMessage;
+                            var unread = conv.UnreadCount;
+
+                            <a href="/Message/Conversation?contactId=@contact.Id" style="text-decoration: none; color: inherit;">
+                                <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s; display: flex; gap: 15px; align-items: center; background: @(unread > 0 ? "rgba(57, 255, 20, 0.1)" : "transparent");">
+                                    <div style="width: 50px; height: 50px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--brown-dark); flex-shrink: 0;">
+                                        @(contact.FullName?.Substring(0, 1) ?? "U")
+                                    </div>
+                                    <div style="flex-grow: 1; overflow: hidden;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                            <span style="font-weight: bold;">@contact.FullName</span>
+                                            <span style="font-size: 0.8rem; color: #ccc;">@lastMsg.SentDate.ToString("MMM dd")</span>
+                                        </div>
+                                        <div style="font-size: 0.9rem; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            @if (lastMsg.SenderId == contact.Id)
+                                            {
+                                                <span>@lastMsg.Content</span>
+                                            }
+                                            else
+                                            {
+                                                <span>You: @lastMsg.Content</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    @if (unread > 0)
+                                    {
+                                        <div style="background: var(--neon-green); color: var(--charcoal-bg); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold;">
+                                            @unread
+                                        </div>
+                                    }
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div style="padding: 30px; text-align: center; color: #ccc;">
+                        <p>No messages yet.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Placeholder for Chat Area (Desktop) -->
+        <div style="flex: 2; min-width: 300px; display: none; @(conversations != null && conversations.Any() ? "display: block;" : "")" class="d-none d-md-block">
+            <div class="card" style="height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; color: #ccc;">
+                <div>
+                    <div style="font-size: 4rem; margin-bottom: 20px;">💬</div>
+                    <h3>Select a conversation</h3>
+                    <p>Choose a contact from the left to start chatting.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media (min-width: 768px) {
+        .d-md-block { display: block !important; }
+    }
+    @@media (max-width: 767px) {
+        .d-none { display: none !important; }
+    }
+</style>
